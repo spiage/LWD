@@ -204,7 +204,7 @@ users:
   - name: $SSH_USER
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
-    lock_passwd: true
+    lock_passwd: false
     ssh_authorized_keys:
 EOF
 
@@ -224,10 +224,6 @@ package_update: true
 package_upgrade: true
 ssh:
   emit_keys_to_console: false
-  allow_public_ip_addresses: true
-system_info:
-  default_user:
-    name: $SSH_USER
 # Автоматическое расширение корневого раздела при увеличении размера диска
 growpart:
   mode: auto
