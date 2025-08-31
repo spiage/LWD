@@ -204,7 +204,7 @@ users:
   - name: $SSH_USER
     sudo: ALL=(ALL) NOPASSWD:ALL
     shell: /bin/bash
-    lock_passwd: false
+    lock_passwd: true
     ssh_authorized_keys:
 EOF
 
