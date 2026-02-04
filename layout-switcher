@@ -1,0 +1,48 @@
+#!/usr/bin/env python3
+import subprocess
+import sys
+import re
+
+MAP_EN_RU = str.maketrans(
+    'qwertyuiop[]asdfghjkl;\'zxcvbnm,./QWERTYUIOP{}ASDFGHJKL:"ZXCVBNM<>?`~\\|',
+    'йцукенгшщзхъфывапролджэячсмитьбю.ЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ,ёЁ\\/'
+)
+MAP_RU_EN = {v: k for k, v in MAP_EN_RU.items()}
+
+def get_clip():
+    return subprocess.run(
+        ['wl-paste', '--no-newline'],
+        capture_output=True,
+        text=True,
+        timeout=1
+    ).stdout
+
+def set_clip(text):
+    subprocess.run(
+        ['wl-copy', '--trim-newline'],
+        input=text,
+        text=True,
+        timeout=1
+    )
+
+def is_russian(text):
+    ru = len(re.findall(r'[а-яА-ЯёЁ]', text))
+    en = len(re.findall(r'[a-zA-Z]', text))
+    return ru > en if (ru + en) > 0 else False
+
+def switch_layout(text):
+    if not text.strip():
+        return text
+    return text.translate(MAP_RU_EN) if is_russian(text) else text.translate(MAP_EN_RU)
+
+if __name__ == '__main__':
+    try:
+        text = get_clip()
+        new_text = switch_layout(text)
+        set_clip(new_text)
+        subprocess.run([
+            'notify-send', '-a', 'layout-switcher', '-t', '500',
+            '🔤 Раскладка изменена', f'"{new_text[:40].strip()}"'
+        ], timeout=0.3)
+    except Exception as e:
+        sys.exit(1)
